@@ -14,7 +14,6 @@ public class Candidate {
 
     }
 
-
     public Candidate(int id, String name, String desc, LocalDate create) {
         this.id = id;
         this.name = name;
