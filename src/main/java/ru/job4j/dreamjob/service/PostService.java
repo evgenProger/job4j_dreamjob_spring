@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import ru.job4j.dreamjob.model.Post;
 import ru.job4j.dreamjob.store.PostStore;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,8 +18,8 @@ public class PostService {
         this.store = store;
     }
 
-    public List<Post> findAll() {
-        return (List<Post>) store.findAll();
+    public Collection<Post> findAll() {
+        return  store.findAll();
     }
 
     public Post add(Post post) {

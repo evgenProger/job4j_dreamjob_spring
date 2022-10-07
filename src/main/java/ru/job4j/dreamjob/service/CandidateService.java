@@ -7,6 +7,7 @@ import ru.job4j.dreamjob.model.Post;
 import ru.job4j.dreamjob.store.CandidateStore;
 import ru.job4j.dreamjob.store.PostStore;
 
+import java.util.Collection;
 import java.util.List;
 
 @ThreadSafe
@@ -19,8 +20,8 @@ public class CandidateService {
         this.store = store;
     }
 
-    public List<Candidate> findAll() {
-        return (List<Candidate>) store.findAll();
+    public Collection<Candidate> findAll() {
+        return store.findAll();
     }
 
     public Candidate add(Candidate candidate) {
