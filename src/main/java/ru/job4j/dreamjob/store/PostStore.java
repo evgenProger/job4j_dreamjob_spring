@@ -6,6 +6,7 @@ import java.time.LocalDate;
 import java.time.Month;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class PostStore {
@@ -28,4 +29,23 @@ public class PostStore {
         return posts.values();
     }
 
+    public Post add(Post post) {
+        posts.put(post.getId(), post);
+        return post;
+    }
+
+    public Post findById(int id) {
+       Optional<Post> post = posts.values().stream().filter(p -> p.getId() == id).findAny();
+       return post.isEmpty() ? null : post.get();
+    }
+
+    public Post updatePost(Post post) {
+        Post p = findById(post.getId());
+        if (p != null) {
+            p.setName(post.getName());
+            p.setDescription(post.getDescription());
+            p.setCreated(LocalDate.now());
+        }
+        return p;
+    }
 }
