@@ -8,6 +8,7 @@ public class Candidate {
     private String name;
     private String description;
     private LocalDate created;
+    private byte[] photo;
 
     public Candidate() {
 
@@ -68,5 +69,13 @@ public class Candidate {
     @Override
     public int hashCode() {
         return Objects.hash(id);
+    }
+
+    public byte[] getPhoto() {
+        return photo;
+    }
+
+    public void setPhoto(byte[] photo) {
+        this.photo = photo;
     }
 }
