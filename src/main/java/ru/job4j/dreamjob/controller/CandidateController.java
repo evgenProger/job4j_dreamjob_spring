@@ -13,7 +13,6 @@ import org.springframework.web.multipart.MultipartFile;
 import ru.job4j.dreamjob.model.Candidate;
 import ru.job4j.dreamjob.service.CandidateService;
 import ru.job4j.dreamjob.store.CandidateStore;
-
 import java.io.IOException;
 import java.time.LocalDate;
 
@@ -56,7 +55,9 @@ public class CandidateController {
     }
 
     @PostMapping("/updateCandidate")
-    public String updateCandidate(@ModelAttribute Candidate candidate) {
+    public String updateCandidate(@ModelAttribute Candidate candidate,
+                                  @RequestParam("file") MultipartFile file) throws IOException {
+        candidate.setPhoto(file.getBytes());
         candidateService.updateCandidate(candidate);
         return "redirect:/candidates";
     }
