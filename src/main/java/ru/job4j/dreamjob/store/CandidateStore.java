@@ -27,7 +27,6 @@ public class CandidateStore {
                 LocalDate.of(2015, Month.MARCH, 20)));
         candidates.put(3, new Candidate(3, "Micle", "senior",
                 LocalDate.of(2016, Month.JULY, 10)));
-
     }
 
     public Collection<Candidate> findAll() {
