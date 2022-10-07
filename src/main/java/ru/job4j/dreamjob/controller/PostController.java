@@ -29,6 +29,7 @@ public class PostController {
                 new Post(0, "Заполните", "Заполните", LocalDate.now()));
         return "addPost";
     }
+
     @PostMapping("/createPost")
     public String createPost(@ModelAttribute Post post) {
         post.setCreated(LocalDate.now());
