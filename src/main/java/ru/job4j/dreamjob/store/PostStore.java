@@ -8,6 +8,7 @@ import ru.job4j.dreamjob.model.Post;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -40,17 +41,10 @@ public class PostStore {
     }
 
     public Post findById(int id) {
-       Optional<Post> post = posts.values().stream().filter(p -> p.getId() == id).findAny();
-       return post.isEmpty() ? null : post.get();
+        return posts.get(id);
     }
 
     public Post updatePost(Post post) {
-        Post p = findById(post.getId());
-        if (p != null) {
-            p.setName(post.getName());
-            p.setDescription(post.getDescription());
-            p.setCreated(LocalDate.now());
-        }
-        return p;
+        return posts.replace(post.getId(), post);
     }
 }
