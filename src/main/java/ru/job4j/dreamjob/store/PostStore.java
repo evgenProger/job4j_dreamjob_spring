@@ -20,7 +20,6 @@ public class PostStore {
     private final Map<Integer, Post> posts = new ConcurrentHashMap<>();
     private final AtomicInteger ids = new AtomicInteger(4);
 
-
     private PostStore() {
         posts.put(1, new Post(1, "Junior Java Job", "Junior",
                 LocalDate.of(2013, Month.AUGUST, 20), new City(1, "Москва")));
