@@ -7,31 +7,26 @@ import java.util.List;
 import java.util.Optional;
 
 public class PostService {
-    private static final PostStore STORE = PostStore.instOf();
-    private static final  PostService SERVICE = new PostService();
+    private final PostStore store;
 
-    private PostService() {
-
-    }
-
-    public static PostService inst() {
-        return SERVICE;
+    public PostService(PostStore store) {
+        this.store = store;
     }
 
     public List<Post> findAll() {
-        return (List<Post>) STORE.findAll();
+        return (List<Post>) store.findAll();
     }
 
     public Post add(Post post) {
-       return STORE.add(post);
+       return store.add(post);
     }
 
     public Post findById(int id) {
-       return STORE.findById(id);
+       return store.findById(id);
     }
 
     public Post updatePost(Post post) {
-        return STORE.updatePost(post);
+        return store.updatePost(post);
     }
 
 }

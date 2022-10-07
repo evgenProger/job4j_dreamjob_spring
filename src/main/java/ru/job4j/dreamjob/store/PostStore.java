@@ -8,10 +8,11 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class PostStore {
-    private static final PostStore INST = new PostStore();
     private final Map<Integer, Post> posts = new ConcurrentHashMap<>();
+    private final AtomicInteger ids = new AtomicInteger(4);
 
 
     private PostStore() {
@@ -22,14 +23,13 @@ public class PostStore {
         posts.put(3, new Post(3, "Senior Java Job", "Senior",
                 LocalDate.of(2015, Month.JANUARY, 8)));
     }
-    public static PostStore instOf() {
-        return INST;
-    }
+
     public Collection<Post> findAll() {
         return posts.values();
     }
 
     public Post add(Post post) {
+        post.setId(ids.incrementAndGet());
         posts.put(post.getId(), post);
         return post;
     }
