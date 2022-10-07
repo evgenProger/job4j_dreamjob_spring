@@ -1,12 +1,13 @@
 package ru.job4j.dreamjob.store;
 
 import ru.job4j.dreamjob.model.Candidate;
+import ru.job4j.dreamjob.model.Post;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.Month;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class CandidateStore {
@@ -29,5 +30,18 @@ public class CandidateStore {
         return candidates.values();
     }
 
+    public Candidate add(Candidate candidate) {
+        candidates.put(candidate.getId(), candidate);
+        return candidate;
+    }
+
+    public Candidate findById(int id) {
+        Optional<Candidate> candidate = Optional.ofNullable(candidates.get(id));
+        return candidate.isEmpty() ? null : candidate.get();
+    }
+
+    public Candidate updateCandidate(Candidate candidate) {
+        return candidates.replace(candidate.getId(), candidate);
+    }
 
 }
