@@ -1,3 +1,9 @@
+CREATE TABLE cities
+(
+    id   SERIAL PRIMARY KEY,
+    name TEXT
+);
+
 CREATE TABLE post (
    id SERIAL PRIMARY KEY,
    name TEXT,
@@ -6,11 +12,7 @@ CREATE TABLE post (
    city_id int references cities(id)
 );
 
-CREATE TABLE cities
-(
-    id   SERIAL PRIMARY KEY,
-    name TEXT
-);
+
 
 CREATE TABLE candidate (
     id SERIAL PRIMARY KEY,
@@ -19,7 +21,7 @@ CREATE TABLE candidate (
     created timestamp
 );
 
-
+insert into cities (name) values ('Riga')
 
 
 

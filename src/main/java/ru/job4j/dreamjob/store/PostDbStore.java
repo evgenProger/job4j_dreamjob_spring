@@ -10,6 +10,7 @@ import ru.job4j.dreamjob.model.City;
 import ru.job4j.dreamjob.model.Post;
 
 import java.sql.*;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,15 +29,17 @@ public class PostDbStore {
     public List<Post> findAll() {
         List<Post> posts = new ArrayList<>();
         try (Connection cn = pool.getConnection();
-             PreparedStatement ps = cn.prepareStatement("select * from cities, post where cities.id = post.city_id")
+             //  PreparedStatement ps = cn.prepareStatement("select * from cities, post where cities.id = post.city_id")
+             PreparedStatement ps = cn.prepareStatement("select * from post")
         ) {
             try (ResultSet it = ps.executeQuery()) {
                 while (it.next()) {
                     posts.add(new Post(it.getInt("post.id"),
                             it.getString("name"),
                             it.getString("description"),
-                            it.getObject("created", Timestamp.class).toLocalDateTime().toLocalDate(),
-                            new City(it.getInt("cities.id"), it.getString("cities.name"))));
+                            //  it.getObject("created", Timestamp.class).toLocalDateTime().toLocalDate(),
+                            LocalDate.now(),
+                            new City(1, "Москва")));
                 }
             }
         } catch (Exception e) {
@@ -48,10 +51,14 @@ public class PostDbStore {
 
     public Post add(Post post) {
         try (Connection cn = pool.getConnection();
-             PreparedStatement ps = cn.prepareStatement("INSERT INTO post(name) VALUES (?)",
+             PreparedStatement ps = cn.prepareStatement("INSERT INTO post(name, description, created, city_id)"
+                             + " VALUES (?, ?, ?, ?)",
                      PreparedStatement.RETURN_GENERATED_KEYS)
         ) {
             ps.setString(1, post.getName());
+            ps.setString(2, post.getDescription());
+            ps.setObject(3, Timestamp.valueOf(post.getCreated().atStartOfDay()));
+            ps.setInt(4, post.getCity().getId());
             ps.execute();
             try (ResultSet id = ps.getGeneratedKeys()) {
                 if (id.next()) {
@@ -70,8 +77,8 @@ public class PostDbStore {
 
     public Post findById(int id) {
         try (Connection cn = pool.getConnection();
-             PreparedStatement ps = cn.prepareStatement("SELECT * FROM cities, post where cities.id = post.city_id"
-                     + "and post.id = ?"
+             PreparedStatement ps = cn.prepareStatement("SELECT * FROM  post where cities.id = post.city_id"
+                     + " and post.id = ?"
              )
         ) {
             ps.setInt(1, id);
