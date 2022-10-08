@@ -3,6 +3,7 @@ package ru.job4j.dreamjob.service;
 import net.jcip.annotations.ThreadSafe;
 import org.springframework.stereotype.Service;
 import ru.job4j.dreamjob.model.Post;
+import ru.job4j.dreamjob.store.PostDbStore;
 import ru.job4j.dreamjob.store.PostStore;
 
 import java.util.Collection;
@@ -12,9 +13,9 @@ import java.util.Optional;
 @ThreadSafe
 @Service
 public class PostService {
-    private final PostStore store;
+    private final PostDbStore store;
 
-    public PostService(PostStore store) {
+    public PostService(PostDbStore store) {
         this.store = store;
     }
 
@@ -30,8 +31,7 @@ public class PostService {
        return store.findById(id);
     }
 
-    public Post updatePost(Post post) {
+    public boolean updatePost(Post post) {
         return store.updatePost(post);
     }
-
 }
