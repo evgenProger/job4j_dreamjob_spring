@@ -40,8 +40,7 @@ public class CandidateStore {
     }
 
     public Candidate findById(int id) {
-        Optional<Candidate> candidate = Optional.ofNullable(candidates.get(id));
-        return candidate.isEmpty() ? null : candidate.get();
+       return candidates.get(id);
     }
 
     public Candidate updateCandidate(Candidate candidate) {
