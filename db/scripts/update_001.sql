@@ -21,7 +21,8 @@ CREATE TABLE candidate (
     created timestamp
 );
 
-insert into cities (name) values ('Riga')
+select post.id, post.name, post.description, post.created, city_id, cities.name from cities, post  where cities.id = post.city_id
+
 
 
 

@@ -4,6 +4,7 @@ import net.jcip.annotations.ThreadSafe;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 import ru.job4j.dreamjob.model.Candidate;
 import ru.job4j.dreamjob.model.City;
@@ -14,8 +15,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+@Repository
 @ThreadSafe
-@Service
 public class CandidateDbStore {
 
     private final BasicDataSource pool;
@@ -46,7 +47,6 @@ public class CandidateDbStore {
         }
         return candidates;
     }
-
 
     public Candidate add(Candidate candidate) {
         try (Connection cn = pool.getConnection();

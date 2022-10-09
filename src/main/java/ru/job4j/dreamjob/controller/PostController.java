@@ -33,7 +33,7 @@ public class PostController {
 
     @GetMapping("/formAddPost")
     public String addPost(Model model) {
-        model.addAttribute("cities", cityService.getAllCities());
+        model.addAttribute("cities", cityService.findAllCities());
         return "addPost";
     }
 
@@ -55,5 +55,4 @@ public class PostController {
         postService.updatePost(post);
         return "redirect:/posts";
     }
-
 }

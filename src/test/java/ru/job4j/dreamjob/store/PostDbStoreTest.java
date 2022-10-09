@@ -1,5 +1,6 @@
 package ru.job4j.dreamjob.store;
 
+import org.apache.commons.dbcp2.BasicDataSource;
 import org.junit.Test;
 import ru.job4j.dreamjob.Main;
 import ru.job4j.dreamjob.model.City;
@@ -14,13 +15,18 @@ import static org.junit.Assert.*;
 public class PostDbStoreTest {
     @Test
     public void whenCreatePost() {
-        PostDbStore store = new PostDbStore(new Main().loadPool());
+        City city = new City(1, "Riga");
+        BasicDataSource basicDataSource = new Main().loadPool();
+        PostDbStore store = new PostDbStore(basicDataSource);
+        CityDbStore cityDbStore = new CityDbStore(basicDataSource);
         Post post = new Post(0, "Test", "Test", LocalDate.now(),
-                new City(1, "Test"));
+                city);
+        cityDbStore.add(city);
         store.add(post);
         List<Post> all = store.findAll();
         Post postInDb = store.findById(post.getId());
-        assertThat(postInDb.getName(), is(post.getName()));
+        assertEquals(postInDb.getName(), (post.getName()));
+        assertEquals(postInDb.getCity().getName(), "Riga");
     }
 
 }

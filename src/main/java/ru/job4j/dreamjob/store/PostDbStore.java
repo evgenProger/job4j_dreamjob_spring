@@ -5,6 +5,7 @@ import org.apache.commons.dbcp2.BasicDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 import ru.job4j.dreamjob.model.City;
 import ru.job4j.dreamjob.model.Post;
@@ -15,9 +16,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 @ThreadSafe
-@Service
+@Repository
 public class PostDbStore {
 
+    private final String selectAll = "select post.id, post.name, post.description, post.created, city_id, cities.name"
+            + " from cities, post  where cities.id = post.city_id";
+    private final String insertPost = "INSERT INTO post (name, description, created, city_id)"
+            + " VALUES (?, ?, ?, ?)";
+    private final String findById = "SELECT * FROM  post, cities where cities.id = post.city_id"
+            + " and post.id = ?";
     private final BasicDataSource pool;
     private static final Logger LOG = LoggerFactory.getLogger(Post.class.getName());
 
@@ -29,17 +36,15 @@ public class PostDbStore {
     public List<Post> findAll() {
         List<Post> posts = new ArrayList<>();
         try (Connection cn = pool.getConnection();
-             //  PreparedStatement ps = cn.prepareStatement("select * from cities, post where cities.id = post.city_id")
-             PreparedStatement ps = cn.prepareStatement("select * from post")
+             PreparedStatement ps = cn.prepareStatement(selectAll)
         ) {
             try (ResultSet it = ps.executeQuery()) {
                 while (it.next()) {
-                    posts.add(new Post(it.getInt("post.id"),
-                            it.getString("name"),
-                            it.getString("description"),
-                            //  it.getObject("created", Timestamp.class).toLocalDateTime().toLocalDate(),
-                            LocalDate.now(),
-                            new City(1, "Москва")));
+                    posts.add(new Post(it.getInt(1),
+                            it.getString(2),
+                            it.getString(3),
+                            it.getObject(4, Timestamp.class).toLocalDateTime().toLocalDate(),
+                            new City(it.getInt(5), it.getString(6))));
                 }
             }
         } catch (Exception e) {
@@ -51,8 +56,7 @@ public class PostDbStore {
 
     public Post add(Post post) {
         try (Connection cn = pool.getConnection();
-             PreparedStatement ps = cn.prepareStatement("INSERT INTO post(name, description, created, city_id)"
-                             + " VALUES (?, ?, ?, ?)",
+             PreparedStatement ps = cn.prepareStatement(insertPost,
                      PreparedStatement.RETURN_GENERATED_KEYS)
         ) {
             ps.setString(1, post.getName());
@@ -71,15 +75,9 @@ public class PostDbStore {
         return post;
     }
 
-    private void update(Post post) {
-
-    }
-
     public Post findById(int id) {
         try (Connection cn = pool.getConnection();
-             PreparedStatement ps = cn.prepareStatement("SELECT * FROM  post where cities.id = post.city_id"
-                     + " and post.id = ?"
-             )
+             PreparedStatement ps = cn.prepareStatement(findById)
         ) {
             ps.setInt(1, id);
             try (ResultSet it = ps.executeQuery()) {
