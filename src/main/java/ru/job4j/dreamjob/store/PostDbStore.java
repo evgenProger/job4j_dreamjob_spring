@@ -23,7 +23,7 @@ public class PostDbStore {
             + " from cities join post  on cities.id = post.city_id";
     private final String insertPost = "INSERT INTO post (name, description, created, city_id)"
             + " VALUES (?, ?, ?, ?)";
-    private final String findById = "SELECT * FROM  post, cities where cities.id = post.city_id"
+    private final String findById = "SELECT * FROM  post join  cities on  cities.id = post.city_id"
             + " and post.id = ?";
     private final String update = "UPDATE post set name = ?,"
             + "description = ?,"

@@ -24,7 +24,7 @@ public class CandidateDbStore {
     private final String selectById = "SELECT * FROM candidate where id = ?";
     private final String update = "UPDATE candidate set name = ?,"
             + "description = ?,"
-            + "created = now(),"
+            + "created = now()"
             + " where id = ? ";
     private final BasicDataSource pool;
     private static final Logger LOG = LoggerFactory.getLogger(Post.class.getName());
@@ -91,7 +91,7 @@ public class CandidateDbStore {
              PreparedStatement ps = cn.prepareStatement(update)) {
             ps.setString(1, candidate.getName());
             ps.setString(2, candidate.getDescription());
-            ps.setInt(4, candidate.getId());
+            ps.setInt(3, candidate.getId());
             result = ps.executeUpdate() > 0;
         } catch (Exception e) {
             LOG.error("Error", e);
