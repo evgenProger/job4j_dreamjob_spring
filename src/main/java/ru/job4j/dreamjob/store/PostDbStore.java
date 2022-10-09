@@ -25,6 +25,11 @@ public class PostDbStore {
             + " VALUES (?, ?, ?, ?)";
     private final String findById = "SELECT * FROM  post, cities where cities.id = post.city_id"
             + " and post.id = ?";
+    private final String update = "UPDATE post set name = ?,"
+            + "description = ?,"
+            + "created = now(),"
+            + "city_id = ?"
+            + " where id = ? ";
     private final BasicDataSource pool;
     private static final Logger LOG = LoggerFactory.getLogger(Post.class.getName());
 
@@ -40,11 +45,7 @@ public class PostDbStore {
         ) {
             try (ResultSet it = ps.executeQuery()) {
                 while (it.next()) {
-                    posts.add(new Post(it.getInt(1),
-                            it.getString(2),
-                            it.getString(3),
-                            it.getObject(4, Timestamp.class).toLocalDateTime().toLocalDate(),
-                            new City(it.getInt(5), it.getString(6))));
+                    posts.add(createPost(it));
                 }
             }
         } catch (Exception e) {
@@ -52,7 +53,6 @@ public class PostDbStore {
         }
         return posts;
     }
-
 
     public Post add(Post post) {
         try (Connection cn = pool.getConnection();
@@ -82,11 +82,7 @@ public class PostDbStore {
             ps.setInt(1, id);
             try (ResultSet it = ps.executeQuery()) {
                 if (it.next()) {
-                    return new Post(it.getInt("post.id"),
-                            it.getString("name"),
-                            it.getString("description"),
-                            it.getObject("created", Timestamp.class).toLocalDateTime().toLocalDate(),
-                            new City(it.getInt("cities.id"), it.getString("cities.name")));
+                    return createPost(it);
                 }
             }
         } catch (Exception e) {
@@ -98,11 +94,7 @@ public class PostDbStore {
     public boolean updatePost(Post post) {
         boolean result = false;
         try (Connection cn = pool.getConnection();
-             PreparedStatement ps = cn.prepareStatement("UPDATE post set name = ?,"
-                     + "description = ?,"
-                     + "created = now(),"
-                     + "city_id = ?"
-                     + " where id = ? ")) {
+             PreparedStatement ps = cn.prepareStatement(update)) {
             ps.setString(1, post.getName());
             ps.setString(2, post.getDescription());
             ps.setInt(3, post.getCity().getId());
@@ -112,5 +104,13 @@ public class PostDbStore {
             LOG.error("Error", e);
         }
         return result;
+    }
+
+    private  Post createPost(ResultSet it) throws SQLException {
+        return new Post(it.getInt("post.id"),
+                it.getString("name"),
+                it.getString("description"),
+                it.getObject("created", Timestamp.class).toLocalDateTime().toLocalDate(),
+                new City(it.getInt("cities.id"), it.getString("cities.name")));
     }
 }
