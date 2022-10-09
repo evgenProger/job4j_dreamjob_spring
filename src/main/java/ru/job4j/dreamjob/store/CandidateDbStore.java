@@ -19,6 +19,14 @@ import java.util.List;
 @ThreadSafe
 public class CandidateDbStore {
 
+    private final String selectAll = "SELECT * FROM candidate";
+    private final String insert = "INSERT INTO candidate (name, description, created) "
+            + "VALUES ( ?, ?, ?)";
+    private final String selectById = "SELECT * FROM candidate where id = ?";
+    private final String update = "UPDATE candidate set name = ?,"
+            + "description = ?,"
+            + "created = now(),"
+            + " where id = ? ";
     private final BasicDataSource pool;
     private static final Logger LOG = LoggerFactory.getLogger(Post.class.getName());
 
@@ -26,20 +34,14 @@ public class CandidateDbStore {
         this.pool = pool;
     }
 
-
     public Collection<Candidate> findAllCandidates() {
         List<Candidate> candidates = new ArrayList<>();
         try (Connection cn = pool.getConnection();
-             PreparedStatement ps = cn.prepareStatement("SELECT * FROM candidate")
+             PreparedStatement ps = cn.prepareStatement(selectAll)
         ) {
             try (ResultSet it = ps.executeQuery()) {
                 while (it.next()) {
-                    candidates.add(new Candidate(it.getInt("id"),
-                            it.getString("name"),
-                            it.getString("description"),
-                            it.getObject("created", Timestamp.class).toLocalDateTime().toLocalDate()));
-
-
+                    candidates.add(create(it));
                 }
             }
         } catch (SQLException throwables) {
@@ -50,11 +52,12 @@ public class CandidateDbStore {
 
     public Candidate add(Candidate candidate) {
         try (Connection cn = pool.getConnection();
-             PreparedStatement ps = cn.prepareStatement("INSERT INTO post(name, description, created) "
-                             + "VALUES ( ?, ?, ?)",
+             PreparedStatement ps = cn.prepareStatement(insert,
                      PreparedStatement.RETURN_GENERATED_KEYS)
         ) {
             ps.setString(1, candidate.getName());
+            ps.setString(2, candidate.getDescription());
+            ps.setObject(3, Timestamp.valueOf(candidate.getCreated().atStartOfDay()));
             ps.execute();
             try (ResultSet id = ps.getGeneratedKeys()) {
                 if (id.next()) {
@@ -62,23 +65,19 @@ public class CandidateDbStore {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+           LOG.error("Error", e);
         }
         return candidate;
     }
 
     public Candidate findById(int id) {
         try (Connection cn = pool.getConnection();
-             PreparedStatement ps = cn.prepareStatement("SELECT * FROM candidate where id = ?")
+             PreparedStatement ps = cn.prepareStatement(selectById)
         ) {
             ps.setInt(1, id);
             try (ResultSet it = ps.executeQuery()) {
                 if (it.next()) {
-                    return new Candidate(it.getInt("candidate.id"),
-                            it.getString("name"),
-                            it.getString("description"),
-                            it.getObject("created", Timestamp.class).toLocalDateTime().toLocalDate());
-
+                    return create(it);
                 }
             }
         } catch (Exception e) {
@@ -90,10 +89,7 @@ public class CandidateDbStore {
     public boolean updateCandidate(Candidate candidate) {
         boolean result = false;
         try (Connection cn = pool.getConnection();
-             PreparedStatement ps = cn.prepareStatement("UPDATE candidate set name = ?,"
-                     + "description = ?,"
-                     + "created = now(),"
-                     + " where id = ? ")) {
+             PreparedStatement ps = cn.prepareStatement(update)) {
             ps.setString(1, candidate.getName());
             ps.setString(2, candidate.getDescription());
             ps.setInt(4, candidate.getId());
@@ -102,5 +98,13 @@ public class CandidateDbStore {
             LOG.error("Error", e);
         }
         return result;
+    }
+
+    private Candidate create(ResultSet it) throws SQLException {
+        return new Candidate(it.getInt("id"),
+                it.getString("name"),
+                it.getString("description"),
+                it.getObject("created", Timestamp.class).toLocalDateTime().toLocalDate());
+
     }
 }

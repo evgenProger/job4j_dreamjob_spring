@@ -21,7 +21,9 @@ CREATE TABLE candidate (
     created timestamp
 );
 
-select post.id, post.name, post.description, post.created, city_id, cities.name from cities, post  where cities.id = post.city_id
+
+
+
 
 
 
