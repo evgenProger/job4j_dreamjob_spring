@@ -20,7 +20,7 @@ import java.util.List;
 public class PostDbStore {
 
     private final String selectAll = "select post.id, post.name, post.description, post.created, city_id, cities.name"
-            + " from cities, post  where cities.id = post.city_id";
+            + " from cities join post  on cities.id = post.city_id";
     private final String insertPost = "INSERT INTO post (name, description, created, city_id)"
             + " VALUES (?, ?, ?, ?)";
     private final String findById = "SELECT * FROM  post, cities where cities.id = post.city_id"
@@ -32,7 +32,6 @@ public class PostDbStore {
             + " where id = ? ";
     private final BasicDataSource pool;
     private static final Logger LOG = LoggerFactory.getLogger(Post.class.getName());
-
 
     public PostDbStore(BasicDataSource pool) {
         this.pool = pool;
@@ -49,7 +48,7 @@ public class PostDbStore {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+           LOG.error("Error", e);
         }
         return posts;
     }
@@ -70,7 +69,7 @@ public class PostDbStore {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+           LOG.error("Error", e);
         }
         return post;
     }
@@ -86,7 +85,7 @@ public class PostDbStore {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+           LOG.error("Error", e);
         }
         return null;
     }
@@ -111,6 +110,6 @@ public class PostDbStore {
                 it.getString("name"),
                 it.getString("description"),
                 it.getObject("created", Timestamp.class).toLocalDateTime().toLocalDate(),
-                new City(it.getInt("cities.id"), it.getString("cities.name")));
+                new City(it.getInt("city_id"), it.getString("cities.name")));
     }
 }
