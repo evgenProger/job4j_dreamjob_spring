@@ -23,10 +23,8 @@ public class PostDbStoreTest {
                 city);
         cityDbStore.add(city);
         store.add(post);
-        List<Post> all = store.findAll();
         Post postInDb = store.findById(post.getId());
         assertEquals(postInDb.getName(), (post.getName()));
         assertEquals(postInDb.getCity().getName(), "Riga");
     }
-
 }

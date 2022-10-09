@@ -24,6 +24,5 @@ public class CandidateDbStoreTest {
         Collection<Candidate> all = store.findAllCandidates();
         Candidate candidateInDb = store.findById(candidate.getId());
         assertEquals(candidateInDb.getName(), (candidateInDb.getName()));
-
     }
 }
