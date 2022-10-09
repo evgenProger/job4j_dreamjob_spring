@@ -18,7 +18,6 @@ import java.util.List;
 @Repository
 @ThreadSafe
 public class CandidateDbStore {
-
     private final String selectAll = "SELECT * FROM candidate";
     private final String insert = "INSERT INTO candidate (name, description, created) "
             + "VALUES ( ?, ?, ?)";

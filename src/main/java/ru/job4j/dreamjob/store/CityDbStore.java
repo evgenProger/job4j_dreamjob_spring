@@ -39,7 +39,7 @@ public class CityDbStore {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+           LOG.error("Error", e);
         }
         return city;
     }
