@@ -24,6 +24,7 @@ public class UserDbStore {
     private final String insertUsers = "INSERT INTO users (email, password)"
             + " VALUES (?, ?)";
     private final String selectAll = "SELECT * FROM users";
+    private final String findUserByEmailAndPwd = "SELECT * FROM  users where email like ? and password like ?";
     private final BasicDataSource pool;
     private static final Logger LOG = LoggerFactory.getLogger(Post.class.getName());
 
@@ -31,7 +32,7 @@ public class UserDbStore {
         this.pool = pool;
     }
 
-    public User findUserByEmail(String email) {
+    public Optional<User> findUserByEmail(String email) {
         try (Connection cn = pool.getConnection();
              PreparedStatement ps = cn.prepareStatement(findUserByEmail)
         ) {
@@ -45,7 +46,24 @@ public class UserDbStore {
             LOG.error("Error", e);
 
         }
-        return null;
+        return Optional.empty();
+    }
+
+    public Optional<User> findUserByEmailAndPwd(String email, String password) {
+        try (Connection cn = pool.getConnection();
+             PreparedStatement ps = cn.prepareStatement(findUserByEmailAndPwd)
+        ) {
+            ps.setString(1, email);
+            ps.setString(2, password);
+            try (ResultSet it = ps.executeQuery()) {
+                if (it.next()) {
+                    return createUser(it);
+                }
+            }
+        } catch (Exception e) {
+            LOG.error("Error", e);
+        }
+        return Optional.empty();
     }
 
     public Optional<User> add(User user) {
@@ -67,11 +85,6 @@ public class UserDbStore {
         }
         return us;
     }
-    private  User createUser(ResultSet it) throws SQLException {
-        return new User(it.getInt("id"),
-                it.getString("email"),
-                it.getString("password"));
-    }
 
     public Collection<User> findAllUsers() {
         List<User> users = new ArrayList<>();
@@ -80,13 +93,21 @@ public class UserDbStore {
         ) {
             try (ResultSet it = ps.executeQuery()) {
                 while (it.next()) {
-                    users.add(createUser(it));
+                    if (createUser(it).isPresent()) {
+                        users.add(createUser(it).get());
+                    }
                 }
             }
         } catch (SQLException throwables) {
             LOG.error("Error", throwables);
         }
         return users;
+    }
+
+    private  Optional<User> createUser(ResultSet it) throws SQLException {
+        return Optional.of(new User(it.getInt("id"),
+                it.getString("email"),
+                it.getString("password")));
     }
 }
 

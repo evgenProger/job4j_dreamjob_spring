@@ -8,6 +8,7 @@ import ru.job4j.dreamjob.model.User;
 
 import java.time.LocalDate;
 import java.util.Collection;
+import java.util.Optional;
 
 import static org.junit.Assert.*;
 
@@ -18,7 +19,7 @@ public class UserDbStoreTest {
         UserDbStore store = new UserDbStore(basicDataSource);
         User user = new User(0, "login", "password");
         store.add(user);
-        User userInDb = store.findUserByEmail(user.getEmail());
-        assertEquals(userInDb.getEmail(), (userInDb.getEmail()));
+        Optional<User> userInDb = store.findUserByEmail(user.getEmail());
+        assertEquals(userInDb.get().getEmail(), (user.getEmail()));
     }
 }
