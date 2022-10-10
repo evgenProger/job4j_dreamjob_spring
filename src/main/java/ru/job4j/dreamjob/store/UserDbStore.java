@@ -5,11 +5,16 @@ import org.apache.commons.dbcp2.BasicDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
+import ru.job4j.dreamjob.model.Candidate;
 import ru.job4j.dreamjob.model.City;
 import ru.job4j.dreamjob.model.Post;
 import ru.job4j.dreamjob.model.User;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
 
 @Repository
 @ThreadSafe
@@ -18,6 +23,7 @@ public class UserDbStore {
     private final String findUserByEmail = "SELECT * FROM  users where email like ?";
     private final String insertUsers = "INSERT INTO users (email, password)"
             + " VALUES (?, ?)";
+    private final String selectAll = "SELECT * FROM users";
     private final BasicDataSource pool;
     private static final Logger LOG = LoggerFactory.getLogger(Post.class.getName());
 
@@ -42,28 +48,45 @@ public class UserDbStore {
         return null;
     }
 
-    public User add(User user) {
+    public Optional<User> add(User user) {
+        Optional<User> us = Optional.of(user);
         try (Connection cn = pool.getConnection();
              PreparedStatement ps = cn.prepareStatement(insertUsers,
                      PreparedStatement.RETURN_GENERATED_KEYS)
         ) {
-            ps.setString(1, user.getEmail());
-            ps.setString(2, user.getPassword());
+            ps.setString(1, us.get().getEmail());
+            ps.setString(2, us.get().getPassword());
             ps.execute();
             try (ResultSet id = ps.getGeneratedKeys()) {
                 if (id.next()) {
-                    user.setId(id.getInt(1));
+                    us.get().setId(id.getInt(1));
                 }
             }
         } catch (Exception e) {
            LOG.error("Error", e);
         }
-        return user;
+        return us;
     }
     private  User createUser(ResultSet it) throws SQLException {
         return new User(it.getInt("id"),
                 it.getString("email"),
                 it.getString("password"));
+    }
+
+    public Collection<User> findAllUsers() {
+        List<User> users = new ArrayList<>();
+        try (Connection cn = pool.getConnection();
+             PreparedStatement ps = cn.prepareStatement(selectAll)
+        ) {
+            try (ResultSet it = ps.executeQuery()) {
+                while (it.next()) {
+                    users.add(createUser(it));
+                }
+            }
+        } catch (SQLException throwables) {
+            LOG.error("Error", throwables);
+        }
+        return users;
     }
 }
 
