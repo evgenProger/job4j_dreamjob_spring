@@ -21,8 +21,8 @@ import java.util.Optional;
 public class UserDbStore {
 
     private final String findUserByEmail = "SELECT * FROM  users where email like ?";
-    private final String insertUsers = "INSERT INTO users (email, password)"
-            + " VALUES (?, ?)";
+    private final String insertUsers = "INSERT INTO users (name, email, password)"
+            + " VALUES (?, ?, ?)";
     private final String selectAll = "SELECT * FROM users";
     private final String findUserByEmailAndPwd = "SELECT * FROM  users where email like ? and password like ?";
     private final BasicDataSource pool;
@@ -67,23 +67,24 @@ public class UserDbStore {
     }
 
     public Optional<User> add(User user) {
-        Optional<User> us = Optional.of(user);
         try (Connection cn = pool.getConnection();
              PreparedStatement ps = cn.prepareStatement(insertUsers,
                      PreparedStatement.RETURN_GENERATED_KEYS)
         ) {
-            ps.setString(1, us.get().getEmail());
-            ps.setString(2, us.get().getPassword());
+            ps.setString(1, user.getName());
+            ps.setString(2, user.getEmail());
+            ps.setString(3, user.getPassword());
             ps.execute();
             try (ResultSet id = ps.getGeneratedKeys()) {
                 if (id.next()) {
-                    us.get().setId(id.getInt(1));
+                    user.setId(id.getInt(1));
+                    return Optional.of(user);
                 }
             }
         } catch (Exception e) {
            LOG.error("Error", e);
         }
-        return us;
+        return Optional.empty();
     }
 
     public Collection<User> findAllUsers() {
@@ -106,6 +107,7 @@ public class UserDbStore {
 
     private  Optional<User> createUser(ResultSet it) throws SQLException {
         return Optional.of(new User(it.getInt("id"),
+                it.getString("name"),
                 it.getString("email"),
                 it.getString("password")));
     }

@@ -4,14 +4,11 @@ import net.jcip.annotations.ThreadSafe;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
-import org.springframework.stereotype.Service;
 import ru.job4j.dreamjob.model.City;
 import ru.job4j.dreamjob.model.Post;
 
 import java.sql.*;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,10 +17,11 @@ import java.util.List;
 public class PostDbStore {
 
     private final String selectAll = "select post.id, post.name, post.description, post.created, city_id, cities.name"
-            + " from cities join post  on cities.id = post.city_id";
+            + " as name_city  from cities join post  on cities.id = post.city_id";
     private final String insertPost = "INSERT INTO post (name, description, created, city_id)"
             + " VALUES (?, ?, ?, ?)";
-    private final String findById = "SELECT * FROM  post join  cities on  cities.id = post.city_id"
+    private final String findById = "SELECT post.id, post.name, post.description, post.created, city_id, cities.name"
+            +  " as name_city  FROM  post join  cities on  cities.id = post.city_id"
             + " and post.id = ?";
     private final String update = "UPDATE post set name = ?,"
             + "description = ?,"
@@ -106,10 +104,10 @@ public class PostDbStore {
     }
 
     private  Post createPost(ResultSet it) throws SQLException {
-        return new Post(it.getInt("post.id"),
+        return new Post(it.getInt("id"),
                 it.getString("name"),
                 it.getString("description"),
                 it.getObject("created", Timestamp.class).toLocalDateTime().toLocalDate(),
-                new City(it.getInt("city_id"), it.getString("cities.name")));
+                new City(it.getInt("city_id"), it.getString("name_city")));
     }
 }

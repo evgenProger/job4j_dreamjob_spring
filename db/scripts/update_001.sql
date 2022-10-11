@@ -23,11 +23,14 @@ CREATE TABLE IF NOT EXISTS candidate (
 
 CREATE TABLE IF NOT EXISTS users (
    id SERIAL PRIMARY KEY,
+   name varchar(25),
    email  varchar(25) unique,
    password TEXT
 );
 
-
+insert into cities (name) values ('Moscow');
+insert into cities (name) values ('Riga');
+insert into cities (name) values ('Aktobe')
 
 
 

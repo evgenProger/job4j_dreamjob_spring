@@ -17,7 +17,7 @@ public class UserDbStoreTest {
     public void whenCreatePost() {
         BasicDataSource basicDataSource = new Main().loadPool();
         UserDbStore store = new UserDbStore(basicDataSource);
-        User user = new User(0, "login", "password");
+        User user = new User(0, "Micle", "login", "password");
         store.add(user);
         Optional<User> userInDb = store.findUserByEmail(user.getEmail());
         assertEquals(userInDb.get().getEmail(), (user.getEmail()));
