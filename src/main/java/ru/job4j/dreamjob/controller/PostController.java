@@ -51,8 +51,9 @@ public class PostController {
 
     @GetMapping("/formUpdatePost/{postId}")
     public String formUpdatePost(Model model, @PathVariable("postId") int id, HttpSession session) {
+        Post post = postService.findById(id);
         model.addAttribute("user", getUser(session));
-        model.addAttribute("post", postService.findById(id));
+        model.addAttribute("post", post);
         return "updatePost";
     }
 

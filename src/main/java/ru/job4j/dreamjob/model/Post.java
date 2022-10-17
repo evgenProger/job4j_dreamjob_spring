@@ -12,6 +12,10 @@ public class Post implements Serializable {
     private boolean visible;
     private City city;
 
+    public Post(int id, String name) {
+        this.id = id;
+        this.name = name;
+    }
 
 
     public String getDescription() {
