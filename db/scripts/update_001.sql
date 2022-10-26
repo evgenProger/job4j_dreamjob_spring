@@ -28,11 +28,10 @@ CREATE TABLE IF NOT EXISTS users (
    password TEXT
 );
 
-insert into cities (name) values ('Moscow');
-insert into cities (name) values ('Riga');
-insert into cities (name) values ('Aktobe')
+insert into post (name) values ('java');
+insert into post (description) values ('java');
 
-
+select * from post where name like 'java' or description like  'java'
 
 
 
