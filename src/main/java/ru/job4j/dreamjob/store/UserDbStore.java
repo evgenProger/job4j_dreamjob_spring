@@ -20,12 +20,12 @@ import java.util.Optional;
 @ThreadSafe
 public class UserDbStore {
 
-    private final String findUserByEmail = "SELECT * FROM  users where email like ?";
-    private final String insertUsers = "INSERT INTO users (name, email, password)"
+    private static final String FINDUSERBYEMAIL = "SELECT * FROM  users where email like ?";
+    private static final String INSERT = "INSERT INTO users (name, email, password)"
             + " VALUES (?, ?, ?)";
-    private final String selectAll = "SELECT * FROM users";
-    private final String findUserByEmailAndPwd = "SELECT * FROM  users where email like ? and password like ?";
-    private final BasicDataSource pool;
+    private static final String SELECTALL = "SELECT * FROM users";
+    private static final String FINDUSERBYEMAILANDPWD = "SELECT * FROM  users where email like ? and password like ?";
+    private  final BasicDataSource pool;
     private static final Logger LOG = LoggerFactory.getLogger(Post.class.getName());
 
     public UserDbStore(BasicDataSource pool) {
@@ -34,7 +34,7 @@ public class UserDbStore {
 
     public Optional<User> findUserByEmail(String email) {
         try (Connection cn = pool.getConnection();
-             PreparedStatement ps = cn.prepareStatement(findUserByEmail)
+             PreparedStatement ps = cn.prepareStatement(FINDUSERBYEMAIL)
         ) {
             ps.setString(1, email);
             try (ResultSet it = ps.executeQuery()) {
@@ -51,7 +51,7 @@ public class UserDbStore {
 
     public Optional<User> findUserByEmailAndPwd(String email, String password) {
         try (Connection cn = pool.getConnection();
-             PreparedStatement ps = cn.prepareStatement(findUserByEmailAndPwd)
+             PreparedStatement ps = cn.prepareStatement(FINDUSERBYEMAILANDPWD)
         ) {
             ps.setString(1, email);
             ps.setString(2, password);
@@ -68,7 +68,7 @@ public class UserDbStore {
 
     public Optional<User> add(User user) {
         try (Connection cn = pool.getConnection();
-             PreparedStatement ps = cn.prepareStatement(insertUsers,
+             PreparedStatement ps = cn.prepareStatement(INSERT,
                      PreparedStatement.RETURN_GENERATED_KEYS)
         ) {
             ps.setString(1, user.getName());
@@ -90,7 +90,7 @@ public class UserDbStore {
     public Collection<User> findAllUsers() {
         List<User> users = new ArrayList<>();
         try (Connection cn = pool.getConnection();
-             PreparedStatement ps = cn.prepareStatement(selectAll)
+             PreparedStatement ps = cn.prepareStatement(SELECTALL)
         ) {
             try (ResultSet it = ps.executeQuery()) {
                 while (it.next()) {

@@ -18,11 +18,11 @@ import java.util.List;
 @Repository
 @ThreadSafe
 public class CandidateDbStore {
-    private final String selectAll = "SELECT * FROM candidate";
-    private final String insert = "INSERT INTO candidate (name, description, created) "
+    private static final String SELECTALL = "SELECT * FROM candidate";
+    private static final String INSERT = "INSERT INTO candidate (name, description, created) "
             + "VALUES ( ?, ?, ?)";
-    private final String selectById = "SELECT * FROM candidate where id = ?";
-    private final String update = "UPDATE candidate set name = ?,"
+    private static final String SELECTBYID = "SELECT * FROM candidate where id = ?";
+    private static final String UPDATE = "UPDATE candidate set name = ?,"
             + "description = ?,"
             + "created = now()"
             + " where id = ? ";
@@ -36,7 +36,7 @@ public class CandidateDbStore {
     public Collection<Candidate> findAllCandidates() {
         List<Candidate> candidates = new ArrayList<>();
         try (Connection cn = pool.getConnection();
-             PreparedStatement ps = cn.prepareStatement(selectAll)
+             PreparedStatement ps = cn.prepareStatement(SELECTALL)
         ) {
             try (ResultSet it = ps.executeQuery()) {
                 while (it.next()) {
@@ -51,7 +51,7 @@ public class CandidateDbStore {
 
     public Candidate add(Candidate candidate) {
         try (Connection cn = pool.getConnection();
-             PreparedStatement ps = cn.prepareStatement(insert,
+             PreparedStatement ps = cn.prepareStatement(INSERT,
                      PreparedStatement.RETURN_GENERATED_KEYS)
         ) {
             ps.setString(1, candidate.getName());
@@ -71,7 +71,7 @@ public class CandidateDbStore {
 
     public Candidate findById(int id) {
         try (Connection cn = pool.getConnection();
-             PreparedStatement ps = cn.prepareStatement(selectById)
+             PreparedStatement ps = cn.prepareStatement(SELECTBYID)
         ) {
             ps.setInt(1, id);
             try (ResultSet it = ps.executeQuery()) {
@@ -88,7 +88,7 @@ public class CandidateDbStore {
     public boolean updateCandidate(Candidate candidate) {
         boolean result = false;
         try (Connection cn = pool.getConnection();
-             PreparedStatement ps = cn.prepareStatement(update)) {
+             PreparedStatement ps = cn.prepareStatement(UPDATE)) {
             ps.setString(1, candidate.getName());
             ps.setString(2, candidate.getDescription());
             ps.setInt(3, candidate.getId());

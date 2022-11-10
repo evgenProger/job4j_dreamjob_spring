@@ -1,7 +1,7 @@
 package ru.job4j.dreamjob.controller;
 
 import net.jcip.annotations.ThreadSafe;
-import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -12,13 +12,10 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ru.job4j.dreamjob.model.Candidate;
-import ru.job4j.dreamjob.model.Path;
 import ru.job4j.dreamjob.service.CandidateService;
-import org.apache.commons.io.FilenameUtils;
 
 import javax.servlet.http.HttpSession;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -50,8 +47,6 @@ public class CandidateController {
         model.addAttribute("user", getUser(session));
         model.addAttribute("candidate",
                 new Candidate(0, "Заполните", "Заполните", LocalDate.now()));
-        File folder = new File(Path.pathToImages("path"));
-        model.addAttribute("files", folder.listFiles());
         return "addCandidate";
     }
 
@@ -77,8 +72,7 @@ public class CandidateController {
     }
 
     @PostMapping("/updateCandidate")
-    public String updateCandidate(@ModelAttribute Candidate candidate,
-                                  @RequestParam("file") MultipartFile file) throws IOException {
+    public String updateCandidate(@ModelAttribute Candidate candidate) throws IOException {
         candidateService.updateCandidate(candidate);
         return "redirect:/candidates";
     }

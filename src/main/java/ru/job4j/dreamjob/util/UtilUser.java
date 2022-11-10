@@ -15,6 +15,7 @@ public final class UtilUser {
             user = new User();
             user.setName("Guest");
         }
+
         return user;
     }
 }
